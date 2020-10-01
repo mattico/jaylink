@@ -403,7 +403,7 @@ impl JayLink {
         // See: http://libusb.sourceforge.net/api-1.0/caveats.html
         let conf = handle.active_configuration().jaylink_err()?;
         if conf != 1 {
-            return Err("another application is accessing the device".to_string()).jaylink_err();
+            warn!("Still not in expected configuration");
         }
 
         Ok(Self {
@@ -1456,7 +1456,7 @@ pub fn scan_usb() -> Result<impl Iterator<Item = UsbDeviceInfo>> {
     let usb = rusb::Context::with_options(&[rusb::UsbOption::use_usbdk()]).jaylink_err()?;
     #[cfg(not(windows))]
     let usb = rusb::Context::new().jaylink_err()?;
-    
+
     log_libusb_info();
 
     Ok(usb
