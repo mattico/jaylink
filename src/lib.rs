@@ -296,8 +296,8 @@ impl JayLink {
             {
                 format!(
                     "{} (this error may be caused by not having the \
-                        WinUSB driver installed; use Zadig (https://zadig.akeo.ie/) to install it \
-                        for the J-Link device; this will replace the SEGGER J-Link driver)",
+                        UsbDk runtime libraries installed: \
+                        https://github.com/daynix/UsbDk/releases)",
                     e
                 )
                 .into()
