@@ -212,7 +212,7 @@ impl SwoStatus {
 /// [`UsbDeviceInfo`]: struct.UsbDeviceInfo.html
 /// [`scan_usb`]: fn.scan_usb.html
 pub struct JayLink {
-    handle: rusb::DeviceHandle<rusb::GlobalContext>,
+    handle: rusb::DeviceHandle<rusb::Context>,
 
     read_ep: u8,
     write_ep: u8,
@@ -1399,7 +1399,7 @@ impl SwoSpeeds {
 /// [`scan_usb`]: fn.scan_usb.html
 #[derive(Debug)]
 pub struct UsbDeviceInfo {
-    inner: rusb::Device<rusb::GlobalContext>,
+    inner: rusb::Device<rusb::Context>,
     vid: u16,
     pid: u16,
 }
@@ -1450,9 +1450,17 @@ impl UsbDeviceInfo {
 ///
 /// The returned iterator will yield all devices made by Segger, without filtering the product ID.
 pub fn scan_usb() -> Result<impl Iterator<Item = UsbDeviceInfo>> {
+    use rusb::UsbContext;
+
+    #[cfg(windows)]
+    let usb = rusb::Context::with_options(&[rusb::UsbOption::use_usbdk()]).jaylink_err()?;
+    #[cfg(not(windows))]
+    let usb = rusb::Context::new().jaylink_err()?;
+    
     log_libusb_info();
 
-    Ok(rusb::devices()
+    Ok(usb
+        .devices()
         .jaylink_err()?
         .iter()
         .filter_map(|dev| {
